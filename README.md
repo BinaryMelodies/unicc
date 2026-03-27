@@ -12,6 +12,7 @@ The repository contains examples for a couple of target languages:
 * FORTRAN 77 with record extensions, compiled using GFortran
 * Java
 * Pascal, compiled using the FreePascal compiler
+* Rust
 
 The examples are very simple and do not always reflect best programming practices.
 The same calculator application is implemented in each language.

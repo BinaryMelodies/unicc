@@ -1,5 +1,5 @@
 
-all: c java cs pascal basic f77
+all: c java cs pascal basic f77 rust
 
 clean:
 	make -C c clean
@@ -8,6 +8,7 @@ clean:
 	make -C pascal clean
 	make -C basic clean
 	make -C f77 clean
+	make -C rust clean
 
 distclean: clean
 	rm -rf *~ */*~
@@ -30,4 +31,7 @@ basic:
 f77:
 	make -C f77
 
-.PHONY: all clean distclean c java cs pascal basic f77
+rust:
+	make -C rust
+
+.PHONY: all clean distclean c java cs pascal basic f77 rust

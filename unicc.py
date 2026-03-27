@@ -19,6 +19,7 @@ class Grammar:
 		self.actions = []
 		self.gotos = []
 		self.states = []
+		self.globals = {}
 
 		self.token_names = {}
 		self.preamble = ""
@@ -193,6 +194,7 @@ CCODE = Terminal('CCODE') # %{ %}
 TOKEN = Terminal('TOKEN') # %token
 START = Terminal('START') # %start
 EMPTY = Terminal('EMPTY') # %empty
+DEFINE = Terminal('DEFINE') # %define
 ACTION = Terminal('ACTION') # { }
 file = NonTerminal('file')
 definitions = NonTerminal('definitions')
@@ -217,6 +219,11 @@ def define_start(name):
 def define_token(*names):
 	for name in names:
 		Terminal(name)
+
+def define_global(name, value):
+	global GRAMMAR
+	assert name not in GRAMMAR.globals
+	GRAMMAR.globals[name] = value
 
 def define_rule(name, *cases):
 	rule = get_token(name)
@@ -248,6 +255,7 @@ definitions.add_rule(definitions, definition)
 definition.add_rule(CCODE).action = lambda *args: add_preamble(args[0])
 definition.add_rule(TOKEN, name_list).action = lambda *args: define_token(*args[1])
 definition.add_rule(START, IDENTIFIER).action = lambda *args: define_start(args[1])
+definition.add_rule(DEFINE, IDENTIFIER, ACTION).action = lambda *args: define_global(args[1], args[2])
 name_list.add_rule(IDENTIFIER)
 name_list.add_rule(name_list, IDENTIFIER)
 rules.add_rule(rule_definition)
@@ -369,7 +377,7 @@ def yylex():
 		return CHARACTER.value
 	elif c == '%':
 		s = c
-		words = {'%%': MARK.value, '%{': None, '%token': TOKEN.value, '%empty': EMPTY.value, '%start': START.value}
+		words = {'%%': MARK.value, '%{': None, '%token': TOKEN.value, '%empty': EMPTY.value, '%start': START.value, '%define': DEFINE.value}
 		starts = [word[:i] for word in words for i in range(1, len(word))]
 		#print(starts)
 		while s in starts:
@@ -537,6 +545,7 @@ def generate(grammar, filename, file = None):
 		'gotos': grammar.gotos,
 		'preamble': grammar.preamble,
 		'postamble': grammar.postamble,
+		'globals': grammar.globals,
 		'module_name': MODULE_NAME,
 	}
 	exec(template, GLOBALS)
