@@ -2,9 +2,25 @@
 %{
 calc: procedure options(main);
 
-	declare 1 yylval /*union*/,
+	declare 1 yylval /*union*/, /* assigning unions is not allowed */
 		2 i fixed,
 		2 s character(16) varying;
+
+	declare 1 globals,
+		2 count fixed initial(0),
+		2 definition(128),
+			3 name character(16) varying,
+			3 value fixed;
+
+	define: procedure(name, value);
+		declare
+			name character(16) varying,
+			value fixed;
+
+		globals.count = globals.count + 1;
+		globals.definition(globals.count).name = name;
+		globals.definition(globals.count).value = value;
+	end define;
 %}
 
 %token IDENTIFIER
@@ -20,9 +36,9 @@ program
 
 line
 	: IDENTIFIER '=' expression
-		{/*
-			globals.push(Definition{name: $1.as_string(), value: $3.as_integer()});
-		*/}
+		{
+			call define($1.s, $3.i);
+		}
 	| expression
 		{
 			put skip list($1.i);
@@ -31,21 +47,21 @@ line
 
 primary
 	: IDENTIFIER
-		{/*
-			let name: String = $1.as_string();
-			let value: i32 = 'result: {
-				for definition in &mut *globals
-				{
-					if definition.name == name
-					{
-						break 'result definition.value;
-					}
-				}
-				println!("Undefined name {:?}\n", name);
-				0
-			};
-			$$ = YYSTYPE::Integer(value);
-		*/}
+		{
+			declare i fixed;
+		search_name:
+			do i = 1 to globals.count;
+				if globals.definition(i).name = $1.s then do;
+					$$.i = globals.definition(i).value;
+					leave search_name;
+				end;
+			end;
+			if i > globals.count then do;
+				put skip list(i, globals.count);
+				put skip list("Undefined name ", $1.s);
+				$$.i = 0;
+			end;
+		}
 	| INTEGER
 		{
 			$$.i = $1.i;
@@ -167,6 +183,5 @@ expression
 
 	declare result fixed;
 	result = yyparse;
-exit: /* TODO: remove */
 end calc;
 

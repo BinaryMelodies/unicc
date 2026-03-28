@@ -13,6 +13,7 @@ The repository contains examples for a couple of target languages:
 * Java
 * Pascal, compiled using the FreePascal compiler
 * Rust
+* PL/I using the [Iron Springs PL/I compiler](http://www.iron-spring.com/) compiler (note: the variable `$PLIPATH` must be set to point to the root of the PL/I installation)
 
 The examples are very simple and do not always reflect best programming practices.
 The same calculator application is implemented in each language.
