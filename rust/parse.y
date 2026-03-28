@@ -9,6 +9,9 @@ enum YYSTYPE
 	String(String),
 }
 
+// needed for yyparse
+const YYEMPTY: YYSTYPE = YYSTYPE::Empty;
+
 impl YYSTYPE
 {
 	fn as_integer(&self) -> i32
