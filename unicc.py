@@ -399,6 +399,8 @@ def yylex():
 				while c == '%':
 					s += c
 					c = INPUT_FILE.read(1)
+				if c != '}':
+					s += '%'
 			YYLVAL = s
 			return CCODE.value
 		else:
