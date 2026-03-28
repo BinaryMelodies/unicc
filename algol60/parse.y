@@ -213,7 +213,6 @@ expression
 
 %%
 
-	integer yytype;
 	is buffered := false;
 	yyinit;
 	yyparse
