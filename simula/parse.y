@@ -65,22 +65,21 @@ line
 primary
 	: IDENTIFIER
 		{
-			$$ :- new YYInteger($1 qua YYInteger.i)
 		}
 	| T_INTEGER
 		{
-			$$ :- new YYInteger($1 qua YYInteger.i)
+			$$ :- $1
 		}
 	| '(' expression ')'
 		{
-			$$ :- new YYInteger($2 qua YYInteger.i)
+			$$ :- $2
 		}
 	;
 
 factor
 	: primary
 		{
-			$$ :- new YYInteger($1 qua YYInteger.i)
+			$$ :- $1
 		}
 	| '-' factor
 		{
@@ -91,7 +90,7 @@ factor
 term
 	: factor
 		{
-			$$ :- new YYInteger($1 qua YYInteger.i)
+			$$ :- $1
 		}
 	| term '*' factor
 		{
@@ -113,7 +112,7 @@ term
 expression
 	: term
 		{
-			$$ :- new YYInteger($1 qua YYInteger.i)
+			$$ :- $1
 		}
 	| expression '+' term
 		{

@@ -10,7 +10,7 @@
 		if is buffered then
 			is buffered := false
 		else
-			inchar(0, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_+-*/=;", buffered character);
+			inchar(0, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_+-*/=();", buffered character);
 
 		getchar := buffered character
 	end;
@@ -106,13 +106,18 @@
 		end
 		else if character = 69 then
 		begin
-			comment semicolon ;
-			yylex := 59
+			comment ( ;
+			yylex := 40
 		end
 		else if character = 70 then
 		begin
-			comment . ;
-			yylex := 46
+			comment ) ;
+			yylex := 41
+		end
+		else if character = 71 then
+		begin
+			comment semicolon ;
+			yylex := 59
 		end
 		else
 		begin
