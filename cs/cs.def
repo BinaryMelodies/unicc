@@ -6,7 +6,7 @@ public class @@{module_name} {
 @@end
 	public object yylval;
 
-	public int yyparse() {
+	public int yyparse(@@{globals.get('yyparse_parameters', '')}) {
 		object[] value_stk = new object[128];
 		int[] state_stk = new int[128];
 		int stk_pos = 0;
@@ -17,7 +17,7 @@ public class @@{module_name} {
 		int current = 0;
 
 		state_stk[0] = 0;
-		look_ahead = yylex();
+		look_ahead = yylex(@@{globals.get('yylex_arguments', '')});
 
 		for(;;)
 		{
@@ -36,7 +36,7 @@ public class @@{module_name} {
 				value_stk[stk_pos] = yylval;
 				stk_pos ++;
 				state_stk[stk_pos] = @@{value};
-				look_ahead = yylex();
+				look_ahead = yylex(@@{globals.get('yylex_arguments', '')});
 				break;
 @@elif action == 'APPLY':
 				apply_rule = @@{value};
@@ -61,7 +61,7 @@ public class @@{module_name} {
 					value_stk[stk_pos] = yylval;
 					stk_pos ++;
 					state_stk[stk_pos] = @@{value};
-					look_ahead = yylex();
+					look_ahead = yylex(@@{globals.get('yylex_arguments', '')});
 					break;
 @@elif action == 'APPLY':
 					apply_rule = @@{value};

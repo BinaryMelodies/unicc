@@ -3,7 +3,7 @@
 @@for value, token in sorted(tokens.items()):
 const @@{token.name} = @@{token.value};
 @@end
-function yyparse: integer;
+function yyparse@@{'(' + globals['yyparse_parameters'] + ')' if 'yyparse_parameters' in globals else ''}: integer;
 	label done;
 	var
 		value_stk: array[0..127] of YYSTYPE;
@@ -20,7 +20,7 @@ function yyparse: integer;
 		value_stk[stk_pos] := yylval;
 		stk_pos := stk_pos + 1;
 		state_stk[stk_pos] := state;
-		look_ahead := yylex
+		look_ahead := yylex@@{'(' + globals['yylex_arguments'] + ')' if 'yylex_arguments' in globals else ''}
 	end;
 
 	procedure gotoState(state: Integer);
@@ -33,7 +33,7 @@ begin
 	stk_pos := 0;
 
 	state_stk[0] := 0;
-	look_ahead := yylex;
+	look_ahead := yylex@@{'(' + globals['yylex_arguments'] + ')' if 'yylex_arguments' in globals else ''};
 
 	running := true;
 

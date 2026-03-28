@@ -8,7 +8,7 @@ Dim Shared YYLVAL As YYSTYPE
 Const @@{token.name} = @@{token.value}
 @@end
 @@end
-Function yyparse() As Integer
+Function yyparse(@@{globals.get('yyparse_parameters', '')}) As Integer
 	Dim value_stk(128) As YYSTYPE
 	Dim state_stk(128) As Integer
 	Dim stk_pos As Integer
@@ -19,7 +19,7 @@ Function yyparse() As Integer
 	stk_pos = 1
 
 	state_stk(1) = 0
-	look_ahead = yylex
+	look_ahead = yylex@@{'(' + globals['yylex_arguments'] + ')' if 'yylex_arguments' in globals else ''}
 
 selection:
 	Select Case state_stk(stk_pos)
@@ -34,7 +34,7 @@ selection:
 			value_stk(stk_pos) = yylval
 			stk_pos = stk_pos + 1
 			state_stk(stk_pos) = @@{value}
-			look_ahead = yylex
+			look_ahead = yylex@@{'(' + globals['yylex_arguments'] + ')' if 'yylex_arguments' in globals else ''}
 			Goto selection
 @@elif action == 'APPLY':
 			Goto rule@@{value}
@@ -60,7 +60,7 @@ selection:
 					value_stk(stk_pos) = yylval
 					stk_pos = stk_pos + 1
 					state_stk(stk_pos) = @@{value}
-					look_ahead = yylex
+					look_ahead = yylex@@{'(' + globals['yylex_arguments'] + ')' if 'yylex_arguments' in globals else ''}
 					Goto selection
 @@elif action == 'APPLY':
 					Goto rule@@{value}

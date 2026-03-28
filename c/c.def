@@ -6,7 +6,7 @@ enum
 	@@{token.name} = @@{token.value},
 @@end
 };
-int yyparse(void)
+int yyparse(@@{globals.get('yyparse_parameters', 'void')})
 {
 	YYSTYPE value_stk[128];
 	int state_stk[128];
@@ -21,7 +21,7 @@ int yyparse(void)
 	value_stk[stk_pos] = yylval; \
 	stk_pos ++; \
 	state_stk[stk_pos] = __state; \
-	look_ahead = yylex(); \
+	look_ahead = yylex(@@{globals.get('yylex_arguments', '')}); \
 	goto select
 
 #define REDUCE(__type) \
@@ -34,7 +34,7 @@ int yyparse(void)
 	state_stk[stk_pos] = __state
 
 	state_stk[0] = 0;
-	look_ahead = yylex();
+	look_ahead = yylex(@@{globals.get('yylex_arguments', '')});
 
 select:
 	switch(state_stk[stk_pos])
