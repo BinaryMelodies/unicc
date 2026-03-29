@@ -6,11 +6,11 @@ const @@{token.name} = @@{token.value};
 function yyparse@@{'(' + globals['yyparse_parameters'] + ')' if 'yyparse_parameters' in globals else ''}: integer;
 	label done;
 	var
-		value_stk: array[0..127] of YYSTYPE;
+		value_stk: array[0..127] of @@{globals.get('yystype', 'YYSTYPE')};
 		state_stk: array[0..127] of Integer;
 		stk_pos: Integer;
 		look_ahead: Integer;
-		yyval: YYSTYPE;
+		yyval: @@{globals.get('yystype', 'YYSTYPE')};
 		current: Integer;
 		apply_rule: Integer;
 		running: Boolean;

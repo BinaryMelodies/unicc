@@ -5,13 +5,16 @@
 	declare @@{token.name} fixed value(@@{token.value});
 @@end
 
-	yyparse: procedure returns(fixed);
+	yyparse: procedure@@{'(' + globals['yyparse_parameters'] + ')' if 'yyparse_parameters' in globals else ''} returns(fixed);
+@@if 'yyparse_parameter_declarations' in globals:
+@@print(globals['yyparse_parameter_declarations'], file = file);
+@@end
 		declare
-			value_stk(128) like yylval,
+			value_stk(128) @@{globals.get('yystype', 'like yylval')},
 			state_stk(128) fixed,
 			stk_pos fixed initial(1),
 			look_ahead fixed,
-			yyval like yylval,
+			yyval @@{globals.get('yystype', 'like yylval')},
 			current fixed;
 
 		SHIFT: procedure(state);
@@ -19,7 +22,7 @@
 			value_stk(stk_pos) = yylval;
 			stk_pos = stk_pos + 1;
 			state_stk(stk_pos) = state;
-			look_ahead = yylex;
+			look_ahead = yylex@@{'(' + globals['yylex_arguments'] + ')' if 'yylex_arguments' in globals else ''};
 			go to select_state;
 		end SHIFT;
 
@@ -37,7 +40,7 @@
 		end GOTO;
 
 		state_stk(1) = 0;
-		look_ahead = yylex();
+		look_ahead = yylex@@{'(' + globals['yylex_arguments'] + ')' if 'yylex_arguments' in globals else ''};
 
 	select_state:
 		select(state_stk(stk_pos));

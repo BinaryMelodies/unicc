@@ -8,13 +8,13 @@ enum
 };
 int yyparse(@@{globals.get('yyparse_parameters', 'void')})
 {
-	YYSTYPE value_stk[128];
+	@@{globals.get('yystype', 'YYSTYPE')} value_stk[128];
 	int state_stk[128];
 	int stk_pos = 0;
 
 	int look_ahead;
 
-	YYSTYPE yyval;
+	@@{globals.get('yystype', 'YYSTYPE')} yyval;
 	int current;
 
 #define SHIFT(__state) \

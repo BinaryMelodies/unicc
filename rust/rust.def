@@ -9,11 +9,11 @@ const @@{token.name}: i32 = @@{token.value};
 
 fn yyparse(@@{globals.get('yyparse_parameters', '')}) -> i32
 {
-	let mut value_stk: [YYSTYPE; 128] = [YYEMPTY; 128];
+	let mut value_stk: [@@{globals.get('yystype', 'YYSTYPE')}; 128] = [@@{globals.get('yyempty', 'YYEMPTY')}; 128];
 	let mut state_stk: [i32; 128] = [0; 128];
 	let mut stk_pos: usize = 0;
 	let mut look_ahead: i32;
-	let mut yylval: YYSTYPE;
+	let mut yylval: @@{globals.get('yystype', 'YYSTYPE')};
 	let mut current: i32;
 
 	state_stk[0] = 0;
@@ -22,7 +22,7 @@ fn yyparse(@@{globals.get('yyparse_parameters', '')}) -> i32
 	loop
 	{
 		let mut apply_rule: i32 = -1;
-		let mut yyval: YYSTYPE = YYEMPTY;
+		let mut yyval: @@{globals.get('yystype', 'YYSTYPE')} = @@{globals.get('yyempty', 'YYEMPTY')};
 
 		match state_stk[stk_pos]
 		{

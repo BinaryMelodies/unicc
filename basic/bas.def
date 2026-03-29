@@ -9,11 +9,11 @@ Const @@{token.name} = @@{token.value}
 @@end
 @@end
 Function yyparse(@@{globals.get('yyparse_parameters', '')}) As Integer
-	Dim value_stk(128) As YYSTYPE
+	Dim value_stk(128) As @@{globals.get('yystype', 'YYSTYPE')}
 	Dim state_stk(128) As Integer
 	Dim stk_pos As Integer
 	Dim look_ahead As Integer
-	Dim yyval As YYSTYPE
+	Dim yyval As @@{globals.get('yystype', 'YYSTYPE')}
 	Dim current As Integer
 
 	stk_pos = 1

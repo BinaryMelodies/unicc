@@ -7,13 +7,13 @@ public class @@{module_name} {
 	public object yylval;
 
 	public int yyparse(@@{globals.get('yyparse_parameters', '')}) {
-		object[] value_stk = new object[128];
+		@@{globals.get('yystype', 'object')}[] value_stk = new object[128];
 		int[] state_stk = new int[128];
 		int stk_pos = 0;
 
 		int look_ahead;
 
-		object yyval = null;
+		@@{globals.get('yystype', 'object')} yyval = null;
 		int current = 0;
 
 		state_stk[0] = 0;

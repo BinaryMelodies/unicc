@@ -7,13 +7,13 @@ public class @@{module_name} {
 	public Object yylval;
 
 	public int yyparse(@@{globals.get('yyparse_parameters', '')}) throws Exception {
-		Object[] value_stk = new Object[128];
+		@@{globals.get('yystype', 'Object')}[] value_stk = new Object[128];
 		int[] state_stk = new int[128];
 		int stk_pos = 0;
 
 		int look_ahead;
 
-		Object yyval = null;
+		@@{globals.get('yystype', 'Object')} yyval = null;
 		int current = 0;
 
 		state_stk[0] = 0;
