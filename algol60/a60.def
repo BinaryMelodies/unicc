@@ -11,15 +11,18 @@ begin
 @@end
 	end;
 
-	integer procedure yyparse;
+	integer procedure yyparse@@{'(' + globals['yyparse_parameters'] + ')' if 'yyparse_parameters' in globals else ''};
+@@if 'yyparse_parameter_declarations' in globals:
+@@print(globals['yyparse_parameter_declarations'], file = file);
+@@end
 	begin
-		integer array val stk[0:127];
+		@@{globals.get('yystype', 'integer')} array val stk[0:127];
 		integer array state stk[0:127];
 		integer stk pos;
 
 		integer look ahead;
 
-		integer yyval;
+		@@{globals.get('yystype', 'integer')} yyval;
 		integer current;
 
 		procedure shift state(state);
@@ -29,7 +32,7 @@ begin
 			val stk[stk pos] := yylval;
 			stk pos := stk pos + 1;
 			state stk[stk pos] := state;
-			look ahead := yylex;
+			look ahead := yylex@@{'(' + globals['yylex_arguments'] + ')' if 'yylex_arguments' in globals else ''};
 			go to select
 		end;
 
@@ -53,7 +56,7 @@ begin
 		stk pos := 0;
 
 		state stk[0] := 0;
-		look ahead := yylex;
+		look ahead := yylex@@{'(' + globals['yylex_arguments'] + ')' if 'yylex_arguments' in globals else ''};
 
 	select:
 		begin
