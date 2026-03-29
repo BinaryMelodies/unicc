@@ -1,6 +1,6 @@
 
 calc: parse.c
-	gcc $< -o $@ -lalgol -I${MARSTPATH} -L${MARSTPATH}/.libs -g
+	gcc -std=gnu2x $< -o $@ -lalgol -g
 
 parse.c: parse.alg
 	marst $< -o $@

@@ -6,14 +6,17 @@ It takes a programming language template file (typically with a `.def` extension
 Instead of generating a parser, UniCC can also do the parsing on the fly, and the Yacc grammar it uses is stored in its parsed form in the code.
 
 The repository contains examples for a couple of target languages:
-* BASIC, compiled using the FreeBASIC compiler
-* C, compiled using GCC
-* C Sharp, compiled using Mono
-* FORTRAN 77 with record extensions, compiled using GFortran
+* BASIC, compiled using [the FreeBASIC compiler](https://www.freebasic.net/)
+* C, compiled using [the GNU Compiler Collection](https://gcc.gnu.org/)
+* C Sharp, compiled using [Mono](https://www.mono-project.com/)
+* FORTRAN 77 with record extensions, compiled using GFortran (part of the GNU Compiler Collection)
 * Java
-* Pascal, compiled using the FreePascal compiler
+* Pascal, compiled using [the FreePascal compiler](https://www.freepascal.org/)
 * Rust
 * PL/I using the [Iron Springs PL/I compiler](http://www.iron-spring.com/) compiler (note: the variable `$PLIPATH` must be set to point to the root of the PL/I installation)
+* ALGOL 60 using [GNU MARST](https://www.gnu.org/software/marst/marst.html)
+* ALGOL W using [AWE](https://github.com/glynawe/awe)
+* Simula using [GNU CIM](https://www.gnu.org/software/cim/)
 
 The examples are very simple and do not always reflect best programming practices.
 The same calculator application is implemented in each language.

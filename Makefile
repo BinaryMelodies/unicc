@@ -1,5 +1,5 @@
 
-all: c java cs pascal basic f77 rust pli
+all: c java cs pascal basic f77 rust pli algol60 algolw simula
 
 clean:
 	make -C c clean
@@ -10,6 +10,9 @@ clean:
 	make -C f77 clean
 	make -C rust clean
 	make -C pli clean
+	make -C algol60 clean
+	make -C algolw clean
+	make -C simula clean
 
 distclean: clean
 	rm -rf *~ */*~
@@ -38,4 +41,13 @@ rust:
 pli:
 	make -C pli PLIPATH=${PLIPATH}
 
-.PHONY: all clean distclean c java cs pascal basic f77 rust pli
+algol60:
+	make -C algol60
+
+algolw:
+	make -C algolw
+
+simula:
+	make -C simula
+
+.PHONY: all clean distclean c java cs pascal basic f77 rust pli algol60 algolw simula
