@@ -2,8 +2,10 @@
 %{
 	record YYInteger(integer as_integer);
 	record YYString(string(16) as_string);
+	record Definition(string(16) defined_name; integer defined_value; reference(Definition) next_definition);
 
 	reference(YYInteger, YYString) yylval;
+	reference(Definition) globals;
 
 	string(80) buffered_line;
 	integer buffer_position;
@@ -59,6 +61,7 @@ program
 line
 	: IDENTIFIER '=' expression
 		{
+			globals := Definition(as_string($1), as_integer($3), globals)
 		}
 	| expression
 		{
@@ -70,7 +73,20 @@ line
 primary
 	: IDENTIFIER
 		{
-			$$ := $1
+			reference(Definition) current_definition;
+			current_definition := globals;
+			while current_definition ¬= null do
+			begin
+				if defined_name(current_definition) = as_string($1) then
+				begin
+					$$ := YYInteger(defined_value(current_definition));
+					go to done
+				end;
+				current_definition := next_definition(current_definition)
+			end;
+			write("Undefined name ", as_string($1));
+			$$ := YYInteger(0);
+		done:
 		}
 	| T_INTEGER
 		{
@@ -234,5 +250,6 @@ expression
 	readcard(buffered_line);
 	buffer_position := 0;
 	ENDFILE := EXCEPTION(, 1, , false, " ");
+	globals := null;
 	yytext := yyparse
 
