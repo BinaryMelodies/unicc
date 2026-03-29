@@ -11,7 +11,7 @@ begin
 @@end
 	end;
 
-	integer procedure yyparse;
+	integer procedure yyparse@@{'(' + globals['yyparse_parameters'] + ')' if 'yyparse_parameters' in globals else ''};
 	begin
 		integer yyparse_result;
 		@@{globals['yystype']} array value_stk(0::127);
@@ -28,7 +28,7 @@ begin
 			value_stk(stk_pos) := yylval;
 			stk_pos := stk_pos + 1;
 			state_stk(stk_pos) := state;
-			look_ahead := yylex;
+			look_ahead := yylex@@{'(' + globals['yylex_arguments'] + ')' if 'yylex_arguments' in globals else ''};
 			go to select
 		end;
 
@@ -48,7 +48,7 @@ begin
 		stk_pos := 0;
 
 		state_stk(0) := 0;
-		look_ahead := yylex;
+		look_ahead := yylex@@{'(' + globals['yylex_arguments'] + ')' if 'yylex_arguments' in globals else ''};
 
 	select:
 		case state_stk(stk_pos) + 1 of
