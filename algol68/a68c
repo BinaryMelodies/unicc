@@ -1,0 +1,13 @@
+#! /bin/sh
+A68LIB=/usr/share/algol68toc
+A68INCLUDE=/usr/include/algol68
+OUTPUT=
+if [ "$1" == "-o" ]
+then
+	shift
+	OUTPUT="-o $1"
+	shift
+fi
+a68toc -uname AAAAAAA -lib $A68LIB -dir $A68LIB $1
+gcc -I$A68INCLUDE $A68LIB/Afirst.o $(basename $1 .a68).c -la68s -la68 -lm -lc -lgc $OUTPUT
+rm $(basename $1 .a68).c
