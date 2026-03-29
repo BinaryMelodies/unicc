@@ -35,8 +35,8 @@ line
 primary
 	: TOKIDN
 		{
-			IF(.NOT.LOOKUP($1.S,$1.L))THEN
-			WRITE(*,2)$1
+			IF(.NOT.LOOKUP($1.S,$1.L,$$.I))THEN
+			WRITE(*,2)$1.S
 			2 FORMAT('Undefined name ',A)
 			ENDIF
 		}
@@ -236,9 +236,10 @@ expression
 
 ************************************************************************
 
-      LOGICAL FUNCTION LOOKUP(S, SL)
+      LOGICAL FUNCTION LOOKUP(S, SL, YI)
       CHARACTER*80 S
       INTEGER SL
+      INTEGER YI
 
       INTEGER NDEF
       CHARACTER*80 DEFS(32)
