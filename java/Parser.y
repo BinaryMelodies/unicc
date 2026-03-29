@@ -107,8 +107,8 @@ public static class Definition {
 
 	public static Object lookup(String name) {
 		for(Definition definition = globals; definition != null; definition = definition.next) {
-			if(globals.name.equals(name))
-				return globals.value;
+			if(definition.name.equals(name))
+				return definition.value;
 		}
 		return null;
 	}
