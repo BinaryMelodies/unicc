@@ -10,6 +10,7 @@ The repository contains examples for a couple of target languages:
 * C, compiled using [the GNU Compiler Collection](https://gcc.gnu.org/)
 * C Sharp, compiled using [Mono](https://www.mono-project.com/)
 * FORTRAN 77 with or without record extensions, compiled using GFortran (part of the GNU Compiler Collection)
+* FORTRAN 90/95
 * Java
 * Pascal, compiled using [the FreePascal compiler](https://www.freepascal.org/)
 * Rust
