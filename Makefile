@@ -1,5 +1,5 @@
 
-all: c java cs pascal basic f77 rust pli algol60 algolw simula
+all: c java cs pascal basic f77 rust pli algol60 algolw simula algol68
 
 clean:
 	make -C c clean
@@ -13,6 +13,7 @@ clean:
 	make -C algol60 clean
 	make -C algolw clean
 	make -C simula clean
+	make -C algol68 clean
 
 distclean: clean
 	rm -rf *~ */*~
@@ -50,4 +51,7 @@ algolw:
 simula:
 	make -C simula
 
-.PHONY: all clean distclean c java cs pascal basic f77 rust pli algol60 algolw simula
+algol60:
+	make -C algol68 A68C=${A68C}
+
+.PHONY: all clean distclean c java cs pascal basic f77 rust pli algol60 algolw simula algol68
