@@ -5,8 +5,17 @@
 
 	integer yylval;
 
+	integer definition count;
+	integer array definition names[0:127];
+	integer array definition values[0:127];
+
 	integer procedure getchar;
 	begin
+		comment
+			ALGOL 60 has no concept of a character set, so we must provide a list of characters to index
+			When inchar is invoked, it will search the string for the corresponding character and return a 1 based index to it
+			If the character is not found, a 0 value is returned;
+
 		if is buffered then
 			is buffered := false
 		else
@@ -27,11 +36,15 @@
 		value c;
 		integer c;
 	begin
-		isalnum := 0 < c & c <= 64
+		isalnum := 0 < c & c < 64
 	end;
 
 	integer procedure read identifier;
 	begin
+		comment
+			ALGOL 60 has no string processing implemented
+			So here a 64 character set is used internally to store strings in integer variables
+			Assuming a 32-bit integer, this means we can store up to 5 characters per name;
 		integer identifier;
 		integer character;
 		integer length;
@@ -65,7 +78,7 @@
 		character := 0;
 		for character := getchar while character = 0 do begin dummy: end;
 
-		if character <= 11 then
+		if character < 11 then
 		begin
 			yylval := character - 1;
 			for character := getchar while 0 < character & character <= 11 do
@@ -73,7 +86,7 @@
 			ungetc(character);
 			yylex := INTEGER
 		end
-		else if character <= 63 then
+		else if character < 64 then
 		begin
 			ungetc(character);
 			yylval := read identifier;
@@ -146,6 +159,16 @@ program
 line
 	: IDENTIFIER '=' expression
 		{
+			if definition count < 128 then
+			begin
+				definition names[definition count] := $1;
+				definition values[definition count] := $3;
+				definition count := definition count + 1
+			end
+			else
+			begin
+				outstring(1, "Too many variables\n")
+			end
 		}
 	| expression
 		{
@@ -157,7 +180,20 @@ line
 primary
 	: IDENTIFIER
 		{
-			$$ := $1
+			integer index;
+			for index := 0 step 1 until definition count - 1 do
+			begin
+				if definition names[index] = $1 then
+				begin
+					$$ := definition values[index];
+					go to done
+				end
+			end;
+			outstring(1, "Undefined name ");
+			write identifier($1);
+			outstring(1, "\n");
+			$$ := 0;
+		done:
 		}
 	| INTEGER
 		{
