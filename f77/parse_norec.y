@@ -2,14 +2,17 @@
 %{
       LOGICAL LOOKUP
 
-      STRUCTURE /YYSTYPE/
-      INTEGER I
-      CHARACTER*80 S
-      INTEGER L
-      END STRUCTURE
+      INTEGER STKI(128)
+      CHARACTER*80 STKS(128)
+      INTEGER STKSL(128)
+      INTEGER YLI
+      CHARACTER*80 YLS
+      INTEGER YLSL
+      INTEGER YI
+      CHARACTER*80 YS
+      INTEGER YSL
+      COMMON/YY/STKI,STKS,STKSL,YLI,YLS,YLSL,YI,YS,YSL
 %}
-
-%define yystype {RECORD/YYSTYPE/}
 
 %token TOKIDN
 %token TOKINT
@@ -25,11 +28,11 @@ program
 line
 	: TOKIDN '=' expression
 		{
-			CALL DEFVAR($1.S,$1.L,$3.I)
+			CALL DEFVAR(STKS($1),STKSL($1),STKI($3))
 		}
 	| expression
 		{
-			WRITE(*,1)$1.I
+			WRITE(*,1)STKI($1)
 			1 FORMAT(I10)
 		}
 	;
@@ -37,29 +40,29 @@ line
 primary
 	: TOKIDN
 		{
-			IF(.NOT.LOOKUP($1.S,$1.L,$$.I))THEN
-			WRITE(*,2)$1.S
+			IF(.NOT.LOOKUP(STKS($1),STKSL($1)))THEN
+			WRITE(*,2)$1
 			2 FORMAT('Undefined name ',A)
 			ENDIF
 		}
 	| TOKINT
 		{
-			$$.I = $1.I
+			YI = STKI($1)
 		}
 	| '(' expression ')'
 		{
-			$$.I = $2.I
+			YI = STKI($2)
 		}
 	;
 
 factor
 	: primary
 		{
-			$$.I = $1.I
+			YI = STKI($1)
 		}
 	| '-' factor
 		{
-			$$.I = -$2.I
+			YI = -STKI($2)
 		}
 	;
 
@@ -67,14 +70,14 @@ term
 	: factor
 	| term '*' factor
 		{
-			$$.I = $1.I * $3.I
+			YI = STKI($1) * STKI($3)
 		}
 	| term '/' factor
 		{
-			IF($3.I.EQ.0)THEN
+			IF($3.EQ.0)THEN
 				WRITE(*,*)'Division by zero'
 			ELSE
-				$$.I = $1.I / $3.I
+				YI = STKI($1) / STKI($3)
 			ENDIF
 		}
 	;
@@ -83,11 +86,11 @@ expression
 	: term
 	| expression '+' term
 		{
-			$$.I = $1.I + $3.I
+			YI = STKI($1) + STKI($3)
 		}
 	| expression '-' term
 		{
-			$$.I = $1.I - $3.I
+			YI = STKI($1) - STKI($3)
 		}
 	;
 
@@ -145,14 +148,16 @@ expression
       INTEGER LINEPOS
       COMMON/IO/LINE,LINEPOS
 
-      STRUCTURE /YYSTYPE/
-      INTEGER I
-      CHARACTER*80 S
-      INTEGER L
-      END STRUCTURE
-
-      RECORD/YYSTYPE/YYLVAL
-      COMMON/YY/YYLVAL
+      INTEGER STKI(128)
+      CHARACTER*80 STKS(128)
+      INTEGER STKSL(128)
+      INTEGER YLI
+      CHARACTER*80 YLS
+      INTEGER YLSL
+      INTEGER YI
+      CHARACTER*80 YS
+      INTEGER YSL
+      COMMON/YY/STKI,STKS,STKSL,YLI,YLS,YLSL,YI,YS,YSL
 
       CHARACTER GETCHAR*1
       CHARACTER C*1
@@ -164,11 +169,11 @@ expression
 
       IF('0'.LE.C.AND.C.LE.'9')THEN
 
-      YYLVAL.I=IACHAR(C)-IACHAR('0')
+      YLI=IACHAR(C)-IACHAR('0')
 2     C=GETCHAR()
 
       IF('0'.LE.C.AND.C.LE.'9')THEN
-      YYLVAL.I=YYLVAL.I*10+IACHAR(C)-IACHAR('0')
+      YLI=YLI*10+IACHAR(C)-IACHAR('0')
       GOTO 2
       ELSE
       GOTO 3
@@ -179,12 +184,12 @@ expression
 
       ELSEIF(('A'.LE.C.AND.C.LE.'Z').OR.('a'.LE.C.AND.C.LE.'z').OR.C .EQ.'_')THEN
 
-      YYLVAL.L=1
-4     YYLVAL.S(YYLVAL.L:YYLVAL.L)=C
+      YLSL=1
+4     YLS(YLSL:YLSL)=C
       C=GETCHAR()
 
       IF(('A'.LE.C.AND.C.LE.'Z').OR.('a'.LE.C.AND.C.LE.'z').OR.C.EQ. '_'.OR.('0'.LE.C.AND.C.LE.'9'))THEN
-      YYLVAL.L=YYLVAL.L+1
+      YLSL=YLSL+1
       GOTO 4
       ELSE
       GOTO 5
@@ -216,6 +221,50 @@ expression
       END SUBROUTINE
 
 ************************************************************************
+* Stores the values in YL* to the stack position I
+
+      SUBROUTINE YYSTR(I)
+      INTEGER I
+
+      INTEGER STKI(128)
+      CHARACTER*80 STKS(128)
+      INTEGER STKSL(128)
+      INTEGER YLI
+      CHARACTER*80 YLS
+      INTEGER YLSL
+      INTEGER YI
+      CHARACTER*80 YS
+      INTEGER YSL
+      COMMON/YY/STKI,STKS,STKSL,YLI,YLS,YLSL,YI,YS,YSL
+
+      STKI(I) = YLI
+      STKS(I) = YLS
+      STKSL(I) = YLSL
+      END SUBROUTINE
+
+************************************************************************
+* Stores the values in Y* to the stack position I
+
+      SUBROUTINE YYSTR2(I)
+      INTEGER I
+
+      INTEGER STKI(128)
+      CHARACTER*80 STKS(128)
+      INTEGER STKSL(128)
+      INTEGER YLI
+      CHARACTER*80 YLS
+      INTEGER YLSL
+      INTEGER YI
+      CHARACTER*80 YS
+      INTEGER YSL
+      COMMON/YY/STKI,STKS,STKSL,YLI,YLS,YLSL,YI,YS,YSL
+
+      STKI(I) = YI
+      STKS(I) = YS
+      STKSL(I) = YSL
+      END SUBROUTINE
+
+************************************************************************
 
       SUBROUTINE DEFVAR(S, SL, I)
       CHARACTER*80 S
@@ -238,10 +287,20 @@ expression
 
 ************************************************************************
 
-      LOGICAL FUNCTION LOOKUP(S, SL, YI)
+      LOGICAL FUNCTION LOOKUP(S, SL)
       CHARACTER*80 S
       INTEGER SL
+
+      INTEGER STKI(128)
+      CHARACTER*80 STKS(128)
+      INTEGER STKSL(128)
+      INTEGER YLI
+      CHARACTER*80 YLS
+      INTEGER YLSL
       INTEGER YI
+      CHARACTER*80 YS
+      INTEGER YSL
+      COMMON/YY/STKI,STKS,STKSL,YLI,YLS,YLSL,YI,YS,YSL
 
       INTEGER NDEF
       CHARACTER*80 DEFS(32)

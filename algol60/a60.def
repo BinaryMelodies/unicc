@@ -16,20 +16,28 @@ begin
 @@print(globals['yyparse_parameter_declarations'], file = file);
 @@end
 	begin
-		@@{globals.get('yystype', 'integer')} array val stk[0:127];
+@@if 'yystype' in globals:
+		@@{globals['yystype']} array val stk[0:127];
+@@end
 		integer array state stk[0:127];
 		integer stk pos;
 
 		integer look ahead;
 
-		@@{globals.get('yystype', 'integer')} yyval;
+@@if 'yystype' in globals:
+		@@{globals['yystype']} yyval;
+@@end
 		integer current;
 
 		procedure shift state(state);
 			value state;
 			integer state;
 		begin
+@@if 'yystype' in globals:
 			val stk[stk pos] := yylval;
+@@else:
+			store yylval(stk pos);
+@@end
 			stk pos := stk pos + 1;
 			state stk[stk pos] := state;
 			look ahead := yylex@@{'(' + globals['yylex_arguments'] + ')' if 'yylex_arguments' in globals else ''};
@@ -48,7 +56,11 @@ begin
 			value state;
 			integer state;
 		begin
+@@if 'yystype' in globals:
 			val stk[stk pos] := yyval;
+@@else:
+			store yyval(stk pos);
+@@end
 			stk pos := stk pos + 1;
 			state stk[stk pos] := state
 		end;
@@ -138,7 +150,11 @@ rule@@{number}:
 @@end
 @@if rule.action != "":
 	begin
+@@if 'yystype' in globals:
 @@{replace_placeholders(rule.action, 'yyval', 'val stk[stk pos+@@-1]')}
+@@else:
+@@{replace_placeholders(rule.action, '', '(stk pos+@@-1)')}
+@@end
 	end;
 @@end
 	reduce(@@{rule.production.value});

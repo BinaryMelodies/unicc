@@ -1,3 +1,6 @@
 parse.alg
 calc
 parse.c
+parse_alt.alg
+calc_alt
+parse_alt.c

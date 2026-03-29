@@ -143,9 +143,24 @@
 	begin
 		outstring(1, s)
 	end;
-%}
 
-%define yystype {integer}
+	integer array parser val stk[0:127];
+	integer parser yyval;
+
+	procedure store yylval(stk pos);
+		value stk pos;
+		integer stk pos;
+	begin
+		parser val stk[stk pos] := yylval
+	end;
+
+	procedure store yyval(stk pos);
+		value stk pos;
+		integer stk pos;
+	begin
+		parser val stk[stk pos] := parser yyval
+	end;
+%}
 
 %token IDENTIFIER
 %token INTEGER
@@ -163,8 +178,8 @@ line
 		{
 			if definition count < 128 then
 			begin
-				definition names[definition count] := $1;
-				definition values[definition count] := $3;
+				definition names[definition count] := parser val stk[$1];
+				definition values[definition count] := parser val stk[$3];
 				definition count := definition count + 1
 			end
 			else
@@ -174,7 +189,7 @@ line
 		}
 	| expression
 		{
-			outinteger(1, $1);
+			outinteger(1, parser val stk[$1]);
 			outstring(1, "\n")
 		}
 	;
@@ -185,72 +200,72 @@ primary
 			integer index;
 			for index := 0 step 1 until definition count - 1 do
 			begin
-				if definition names[index] = $1 then
+				if definition names[index] = parser val stk[$1] then
 				begin
-					$$ := definition values[index];
+					parser yyval := definition values[index];
 					go to done
 				end
 			end;
 			outstring(1, "Undefined name ");
-			write identifier($1);
+			write identifier(parser val stk[$1]);
 			outstring(1, "\n");
-			$$ := 0;
+			parser yyval := 0;
 		done:
 		}
 	| INTEGER
 		{
-			$$ := $1
+			parser yyval := parser val stk[$1]
 		}
 	| '(' expression ')'
 		{
-			$$ := $2
+			parser yyval := parser val stk[$2]
 		}
 	;
 
 factor
 	: primary
 		{
-			$$ := $1
+			parser yyval := parser val stk[$1]
 		}
 	| '-' factor
 		{
-			$$ := -$2
+			parser yyval := -parser val stk[$2]
 		}
 	;
 
 term
 	: factor
 		{
-			$$ := $1
+			parser yyval := parser val stk[$1]
 		}
 	| term '*' factor
 		{
-			$$ := $1 * $3
+			parser yyval := parser val stk[$1] * parser val stk[$3]
 		}
 	| term '/' factor
 		{
-			if $3 = 0 then
+			if parser val stk[$3] = 0 then
 			begin
 				outstring(1, "Division by zero\n");
-				$$ := 0
+				parser yyval := 0
 			end
 			else
-				$$ := $1 / $3
+				parser yyval := parser val stk[$1] / parser val stk[$3]
 		}
 	;
 
 expression
 	: term
 		{
-			$$ := $1
+			parser yyval := parser val stk[$1]
 		}
 	| expression '+' term
 		{
-			$$ := $1 + $3
+			parser yyval := parser val stk[$1] + parser val stk[$3]
 		}
 	| expression '-' term
 		{
-			$$ := $1 - $3
+			parser yyval := parser val stk[$1] - parser val stk[$3]
 		}
 	;
 
