@@ -48,12 +48,6 @@
 	end;
 %}
 
-%define yyparse_parameters {i}
-%define yyparse_parameter_declarations {
-	value i;
-	integer i;
-}
-
 %token IDENTIFIER
 %token T_INTEGER
 
@@ -212,5 +206,5 @@ expression
 	end;
 
 	has_buffered_character := false;
-	yyparse(1)
+	yyparse
 
