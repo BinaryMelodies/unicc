@@ -14,7 +14,15 @@
 	begin
 	end;
 
+	class Definition(defname, defvalue, next);
+		text defname;
+		integer defvalue;
+		ref(Definition) next;
+	begin
+	end;
+
 	ref(YYSTYPE) yylval;
+	ref(Definition) globals;
 
 	character buffered_character;
 	boolean has_buffered_character;
@@ -54,6 +62,7 @@ program
 line
 	: IDENTIFIER '=' expression
 		{
+			globals :- new Definition($1 qua YYString.s, $3 qua YYInteger.i, globals)
 		}
 	| expression
 		{
@@ -65,6 +74,23 @@ line
 primary
 	: IDENTIFIER
 		{
+			ref(Definition) current_definition;
+			if globals =/= none then
+			begin
+				for current_definition :- globals, current_definition.next while current_definition =/= none do
+				begin
+					if current_definition.defname = $1 qua YYString.s then
+					begin
+						$$ :- new YYInteger(current_definition.defvalue);
+						go to done
+					end
+				end
+			end;
+			outtext("Undefined name ");
+			outtext($1 qua YYString.s);
+			outimage;
+			$$ :- new YYInteger(0);
+		done:
 		}
 	| T_INTEGER
 		{
