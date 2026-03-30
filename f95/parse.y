@@ -1,6 +1,7 @@
 
 %{
-    logical :: lookup
+module parser
+    implicit none
 
     type YYSTYPE
         sequence
@@ -8,6 +9,20 @@
         character (len=80) :: s
         integer :: l
     end type YYSTYPE
+
+    type(YYSTYPE) :: yylval
+
+    character (len=80) :: buffered_line
+    integer :: buffered_line_position
+
+    type definition
+        character (len=80) :: name
+        integer :: length
+        integer :: value
+    end type definition
+
+    integer :: definition_count
+    type(definition), dimension(32) :: definitions
 %}
 
 %define yystype {type(YYSTYPE)}
@@ -92,185 +107,126 @@ expression
 
 %%
 
-function getchar()
-    implicit none
-    character (len=1) :: getchar
+    character (len=1) function getchar()
 
-    character (len=80) :: line
-    integer :: linepos
-    common /io/ line,linepos
+        if(buffered_line_position == 0)then
+            read(*, "(a)") buffered_line
+            buffered_line_position = 1
+        end if
 
-    if(linepos == 0)then
-        read(*, "(a)") line
-        linepos = 1
-    end if
-
-    if(LINEPOS == LEN(LINE)+1) then
-        linepos = 0
-        getchar = achar(10)
-    else
-        getchar = line(linepos:linepos)
-        linepos = linepos+1
-    end if
-
-end function
-
-subroutine ungetchar()
-    implicit none
-
-    character (len=80) :: line
-    integer :: linepos
-    common /io/ line,linepos
-
-    if(linepos >= 1) then
-        linepos = linepos - 1
-    end if
-
-end subroutine
-
-function yylex()
-    implicit none
-    integer :: yylex
-
-    character (len=80) :: line
-    integer :: linepos
-    common /io/ line,linepos
-
-    type YYSTYPE
-        sequence
-        integer :: i
-        character (len=80) :: s
-        integer :: l
-    end type YYSTYPE
-
-    type(YYSTYPE) yylval
-    common /yy/ yylval
-
-    character (len=1) :: getchar
-    character (len=1) :: c
-
-    integer, parameter :: tokidn = 256
-    integer, parameter :: tokint = 257
-
-    do
-        c = getchar()
-        if('0' <= c .and. c <= '9') then
-            yylval%i = iachar(c) - iachar('0')
-            do
-                c = getchar()
-                if('0' <= c .and. c <= '9') then
-                    yylval%i = yylval%i * 10 + iachar(c) - iachar('0')
-                    cycle
-                else
-                    exit
-                end if
-            end do
-
-            call ungetchar
-            yylex = tokint
-        elseif(('A' <= c .and. c <= 'Z') .or. ('a' <= c .and. c <= 'z') .or. c == '_') then
-
-            yylval%l = 1
-            do
-                yylval%s(yylval%l:yylval%l) = c
-                c=getchar()
-
-                if(('A' <= c .and. c <= 'Z') .or. ('a' <= c .and. c <= 'z') .or. c == '_' .or. ('0' <= c .and. c <= '9')) then
-                    yylval%l = yylval%l + 1
-                    cycle
-                else
-                    exit
-                endif
-            end do
-
-            call ungetchar
-            yylex=tokidn
-        else if(c == ' ') then
-            cycle
+        if(buffered_line_position == len(buffered_line) + 1) then
+            buffered_line_position = 0
+            getchar = achar(10)
         else
-            yylex = iachar(c)
+            getchar = buffered_line(buffered_line_position:buffered_line_position)
+            buffered_line_position = buffered_line_position+1
         end if
 
-        exit
+    end function
 
-    end do
+    subroutine ungetchar()
+        if(buffered_line_position >= 1) then
+            buffered_line_position = buffered_line_position - 1
+        end if
 
-end function
+    end subroutine
 
-subroutine yyerror(s)
-    implicit none
-    character (len=*), intent(in) :: s
+    integer function yylex()
+        character (len=1) :: c
 
-    write(*, "(A)") s
+        do
+            c = getchar()
+            if('0' <= c .and. c <= '9') then
+                yylval%i = iachar(c) - iachar('0')
+                do
+                    c = getchar()
+                    if('0' <= c .and. c <= '9') then
+                        yylval%i = yylval%i * 10 + iachar(c) - iachar('0')
+                        cycle
+                    else
+                        exit
+                    end if
+                end do
 
-end subroutine
+                call ungetchar
+                yylex = TOKINT
+            else if(('A' <= c .and. c <= 'Z') .or. ('a' <= c .and. c <= 'z') .or. c == '_') then
 
-subroutine defvar(s, sl, i)
-    implicit none
-    character (len=80), intent(in) :: s
-    integer, intent(in) :: sl
-    integer, intent(in) :: i
+                yylval%l = 1
+                do
+                    yylval%s(yylval%l:yylval%l) = c
+                    c=getchar()
 
-    integer :: ndef
-    character (len=80), dimension(32) :: defs
-    integer, dimension(32) :: defsl
-    integer, dimension(32) :: defi
-    common /def/ ndef,defs,defsl,defi
+                    if(('A' <= c .and. c <= 'Z') .or. ('a' <= c .and. c <= 'z') .or. c == '_' .or. ('0' <= c .and. c <= '9')) then
+                        yylval%l = yylval%l + 1
+                        cycle
+                    else
+                        exit
+                    end if
+                end do
 
-    ndef = ndef + 1
+                call ungetchar
+                yylex = TOKIDN
+            else if(c == ' ') then
+                cycle
+            else
+                yylex = iachar(c)
+            end if
 
-    defs(ndef) = s
-    defsl(ndef) = sl
-    defi(ndef) = i
-
-end subroutine
-
-function lookup(s, sl, yi)
-    implicit none
-    logical :: lookup
-    character (len=80), intent(in) :: s
-    integer, intent(in) :: sl
-    integer, intent(out) :: yi
-
-    integer :: ndef
-    character (len=80), dimension(32) :: defs
-    integer, dimension(32) :: defsl
-    integer, dimension(32) :: defi
-    common /def/ ndef,defs,defsl,defi
-
-    integer :: n
-
-    lookup = .false.
-
-    yi = 0
-    do n = 1, ndef
-        if(s(1:sl) == defs(n)(1:defsl(n))) then
-            yi = defi(n)
-            lookup = .true.
             exit
-        end if
-    end do
 
-end function
+        end do
+
+    end function
+
+    subroutine yyerror(s)
+        character (len=*), intent(in) :: s
+
+        write(*, "(A)") s
+    end subroutine
+
+    subroutine defvar(s, sl, i)
+        character (len=80), intent(in) :: s
+        integer, intent(in) :: sl
+        integer, intent(in) :: i
+
+        definition_count = definition_count + 1
+
+        definitions(definition_count)%name = s
+        definitions(definition_count)%length = sl
+        definitions(definition_count)%value = i
+
+    end subroutine
+
+    logical function lookup(s, sl, yi)
+        character (len=80), intent(in) :: s
+        integer, intent(in) :: sl
+        integer, intent(out) :: yi
+
+        integer :: n
+
+        lookup = .false.
+
+        yi = 0
+        do n = 1, definition_count
+            if(s(1:sl) == definitions(n)%name(1:definitions(n)%length)) then
+                yi = definitions(n)%value
+                lookup = .true.
+                exit
+            end if
+        end do
+
+    end function
+
+end module parser
 
 program parse
+    use parser
     implicit none
-
-    character (len=80) :: line
-    integer :: linepos
-    common /io/ line,linepos
-
-    integer :: ndef
-    character (len=80), dimension(32) :: defs
-    integer, dimension(32) :: defsl
-    integer, dimension(32) :: defi
-    common /def/ ndef,defs,defsl,defi
-
-    integer :: yyparse
 
     integer :: i
 
-    linepos = 0
+    buffered_line_position = 0
 
     i = yyparse()
 
