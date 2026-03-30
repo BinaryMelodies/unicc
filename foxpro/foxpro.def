@@ -11,10 +11,6 @@ FUNCTION yyparse
 	DIMENSION state_stk(128)
 
 	CREATE CURSOR value_stk (s c(16), i n(10))
-	&&CREATE CURSOR yyval (s c(16), i n(10))
-
-	&&SELECT yyval
-	&&APPEND BLANK
 
 	SELECT value_stk
 	stk_pos = 1
@@ -116,10 +112,11 @@ FUNCTION yyparse
 					SELECT v@@{offset+1}
 					GATHER MEMVAR MEMO
 @@end
-					&&SELECT yyval
-					&&SCATTER MEMVAR MEMO
+@@if len(rule.tokens) > 0:
+					SELECT v1
+					SCATTER MEMVAR MEMO
+@@end
 @@{replace_placeholders(rule.action, '??', 'v@@').replace('??.', '')}
-					&&GATHER MEMVAR MEMO
 @@for offset in range(len(rule.tokens)):
 					SELECT v@@{offset+1}
 					USE
@@ -136,9 +133,6 @@ FUNCTION yyparse
 @@end
 @@if len(table) == 1:
 @@for token, entry in sorted(table.items()):
-					&& value_stk(stk_pos) = yyval
-					&&SELECT yyval
-					&&SCATTER MEMVAR MEMO
 					SELECT value_stk
 					GOTO RECORD stk_pos
 					GATHER MEMVAR MEMO

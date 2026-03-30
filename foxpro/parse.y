@@ -13,6 +13,8 @@ PUBLIC IDENTIFIER, INTEGER
 IDENTIFIER = 256
 INTEGER = 257
 
+CREATE CURSOR defines (name c(16), value n(10))
+
 CREATE CURSOR yylval (s c(16), i n(10))
 APPEND BLANK
 
@@ -41,6 +43,7 @@ program
 line
 	: IDENTIFIER '=' expression
 		{
+			INSERT INTO defines (name, value) VALUES ($1.s, $3.i)
 		}
 	| expression
 		{
@@ -53,6 +56,16 @@ line
 primary
 	: IDENTIFIER
 		{
+			SELECT defines
+			LOCATE FOR name = $1.s
+			IF FOUND()
+				$$.i = defines.value
+			ELSE
+				SET TALK ON
+				? "Undefined name", $1.s
+				SET TALK OFF
+				$$.i = 0
+			ENDIF
 		}
 	| INTEGER
 	| '(' expression ')'
