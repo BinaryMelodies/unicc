@@ -51,11 +51,12 @@ fn yyparse(@@{globals.get('yyparse_parameters', '')}) -> i32
 @@else:
 				match look_ahead
 				{
-@@for token, (action, value) in sorted(table.items()):
+@@for token, (action, value) in sorted(table.items(), key = lambda pair: (pair[0] == -1, *pair)):
 @@if token == -1:
-@@continue
-@@end
+				_ =>
+@@else:
 				@@{token} => // @@{tokens[token] if token in tokens else chr(token)!r}
+@@end
 					{
 @@if action == 'SHIFT':
 						value_stk[stk_pos] = yylval;
@@ -72,27 +73,12 @@ fn yyparse(@@{globals.get('yyparse_parameters', '')}) -> i32
 @@end
 					}
 @@end
+@@if -1 not in table:
 				_ =>
 					{
-@@if -1 in table:
-@@(action, value) = table[-1]
-@@if action == 'SHIFT':
-						value_stk[stk_pos] = yylval;
-						stk_pos += 1;
-						state_stk[stk_pos] = @@{value};
-						(look_ahead, yylval) = yylex(@@{globals.get('yylex_arguments', '')});
-@@elif action == 'APPLY':
-						apply_rule = @@{value};
-@@elif action == 'ERROR':
-						yyerror("parse error");
-						return 1;
-@@elif action == 'ACCEPT':
-						return 0;
-@@end
-@@else:
 						panic!();
-@@end
 					}
+@@end
 				}
 @@end
 			}
@@ -147,26 +133,19 @@ fn yyparse(@@{globals.get('yyparse_parameters', '')}) -> i32
 @@else:
 				match current
 				{
-@@for token, entry in sorted(table.items()):
+@@for token, entry in sorted(table.items(), key = lambda pair: (pair[0] == -1, *pair)):
 @@if token == -1:
-@@continue
-@@end
-					@@{token} => // @@{tokens[token] if token in tokens else chr(token)!r}
-						{
-							value_stk[stk_pos] = yyval;
-							stk_pos += 1;
-							state_stk[stk_pos] = @@{entry};
-						}
-@@end
-@@if -1 in table:
-@@entry = table[-1]
 					_ =>
+@@else:
+					@@{token} => // @@{tokens[token] if token in tokens else chr(token)!r}
+@@end
 						{
 							value_stk[stk_pos] = yyval;
 							stk_pos += 1;
 							state_stk[stk_pos] = @@{entry};
 						}
-@@else:
+@@end
+@@if -1 not in table:
 					_ => panic!()
 @@end
 				}

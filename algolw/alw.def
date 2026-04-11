@@ -77,45 +77,27 @@ begin
 @@end
 @@end
 @@else:
-@@case_list = sorted(pair for pair in table.items() if pair[0] != -1)
-@@for index, (token, (action, value)) in enumerate(case_list):
-				@@{'if' if index == 0 else 'else if'} look_ahead = @@{token} then % @@{repr(tokens[token] if token in tokens else chr(token)).replace(';', 'semicolon').replace('%', 'percent')} %
-@@first_case = False
-@@if action == 'SHIFT':
-					shift_state(@@{value})@@{';' if index == len(case_list) - 1 and -1 not in table and i != len(states) - 1 else ''}
-@@elif action == 'APPLY':
-					go to rule@@{value}@@{';' if index == len(case_list) - 1 and -1 not in table and i != len(states) - 1 else ''}
-@@elif action == 'ERROR':
-				begin
-					yyerror("parse error");
-					yyparse_result := 1;
-					go to exit
-				end@@{';' if index == len(case_list) - 1 and -1 not in table and i != len(states) - 1 else ''}
-@@elif action == 'ACCEPT':
-				begin
-					yyparse_result := 0;
-					go to exit
-				end@@{';' if index == len(case_list) - 1 and -1 not in table and i != len(states) - 1 else ''}
-@@end
-@@end
-@@if -1 in table:
-@@(action, value) = table[-1]
+@@for index, (token, (action, value)) in enumerate(sorted(table.items(), key = lambda pair: (pair[0] == -1, *pair))):
+@@if token == -1:
 				else
+@@else:
+				@@{'if' if index == 0 else 'else if'} look_ahead = @@{token} then % @@{repr(tokens[token] if token in tokens else chr(token)).replace(';', 'semicolon').replace('%', 'percent')} %
+@@end
 @@if action == 'SHIFT':
-					shift_state(@@{value})@@{';' if i != len(states) - 1 else ''}
+					shift_state(@@{value})@@{';' if index == len(table) - 1 and i != len(states) - 1 else ''}
 @@elif action == 'APPLY':
-					go to rule@@{value}@@{';' if i != len(states) - 1 else ''}
+					go to rule@@{value}@@{';' if index == len(table) - 1 and i != len(states) - 1 else ''}
 @@elif action == 'ERROR':
 				begin
 					yyerror("parse error");
 					yyparse_result := 1;
 					go to exit
-				end@@{';' if i != len(states) - 1 else ''}
+				end@@{';' if index == len(table) - 1 and i != len(states) - 1 else ''}
 @@elif action == 'ACCEPT':
 				begin
 					yyparse_result := 0;
 					go to exit
-				end@@{';' if i != len(states) - 1 else ''}
+				end@@{';' if index == len(table) - 1 and i != len(states) - 1 else ''}
 @@end
 @@end
 @@end
@@ -155,24 +137,18 @@ rule@@{number}:
 			end@@{';' if i != len(states) - 1 else ''}
 @@end
 @@else:
-@@first_case = True
-@@case_list = sorted(pair for pair in table.items() if pair[0] != -1)
-@@for index, (token, entry) in enumerate(case_list):
-				@@{'if' if index == 0 else 'else if'} current = @@{token} then % @@{repr(tokens[token] if token in tokens else chr(token)).replace(';', 'semicolon').replace('%', 'percent')} %
-@@first_case = False
-				begin
-					goto_state(@@{entry});
-					go to select
-				end@@{';' if index == len(case_list) - 1 and -1 not in table else ''}
-@@end
-@@if -1 in table:
-@@entry = table[-1]
+@@for index, (token, entry) in enumerate(sorted(table.items(), key = lambda pair: (pair[0] == -1, *pair))):
+@@if token == -1:
 				else
+@@else:
+				@@{'if' if index == 0 else 'else if'} current = @@{token} then % @@{repr(tokens[token] if token in tokens else chr(token)).replace(';', 'semicolon').replace('%', 'percent')} %
+@@end
 				begin
 					goto_state(@@{entry});
 					go to select
-				end
-@@else:
+				end@@{';' if index == len(table) - 1 else ''}
+@@end
+@@if -1 not in table:
 				go to select
 @@end
 			end@@{';' if i != len(states) - 1 else ''}

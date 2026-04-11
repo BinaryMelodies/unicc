@@ -65,26 +65,12 @@
 @@end
 @@else:
 				select(look_ahead);
-@@for token, (action, value) in sorted(table.items()):
+@@for token, (action, value) in sorted(table.items(), key = lambda pair: (pair[0] == -1, *pair)):
 @@if token == -1:
-@@continue
-@@end
-					when(@@{token}) do; /* @@{tokens[token] if token in tokens else chr(token)!r} */
-@@if action == 'SHIFT':
-						call SHIFT(@@{value});
-@@elif action == 'APPLY':
-						go to rule@@{value};
-@@elif action == 'ERROR':
-						call yyerror("parse error");
-						return(1);
-@@elif action == 'ACCEPT':
-						return(0);
-@@end
-					end;
-@@end
-@@if -1 in table:
 					otherwise do;
-@@(action, value) = table[-1]
+@@else:
+					when(@@{token}) do; /* @@{tokens[token] if token in tokens else chr(token)!r} */
+@@end
 @@if action == 'SHIFT':
 						call SHIFT(@@{value});
 @@elif action == 'APPLY':
@@ -135,16 +121,12 @@
 @@end
 @@else:
 				select(current);
-@@for token, entry in sorted(table.items()):
+@@for token, entry in sorted(table.items(), key = lambda pair: (pair[0] != -1, *pair)):
 @@if token == -1:
-@@continue
-@@end
-					when(@@{token}) /* @@{tokens[token] if token in tokens else chr(token)!r} */
-						call GOTO(@@{entry});
-@@end
-@@if -1 in table:
-@@entry = table[-1]
 					otherwise
+@@else:
+					when(@@{token}) /* @@{tokens[token] if token in tokens else chr(token)!r} */
+@@end
 						call GOTO(@@{entry});
 @@end
 				end;

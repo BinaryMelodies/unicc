@@ -69,26 +69,12 @@ BEGIN
 @@end
 @@end
 @@else:
-@@case_list = sorted(pair for pair in table.items() if pair[0] != -1)
-@@for index, (token, (action, value)) in enumerate(case_list):
-				@@{'IF' if index == 0 else 'ELIF'} look ahead = @@{token} THEN # @@{repr(tokens[token] if token in tokens else chr(token)).replace('#', 'hash')} #
-@@first_case = False
-@@if action == 'SHIFT':
-					shift state(@@{value})
-@@elif action == 'APPLY':
-					GO TO rule@@{value}
-@@elif action == 'ERROR':
-					yyerror("parse error");
-					yyparse result := 1;
-					go to exit
-@@elif action == 'ACCEPT':
-					yyparse result := 0;
-					go to exit
-@@end
-@@end
-@@if -1 in table:
-@@(action, value) = table[-1]
+@@for index, (token, (action, value)) in enumerate(sorted(table.items(), key = lambda pair: (pair[0] == -1, *pair))):
+@@if token == -1:
 				ELSE
+@@else:
+				@@{'IF' if index == 0 else 'ELIF'} look ahead = @@{token} THEN # @@{repr(tokens[token] if token in tokens else chr(token)).replace('#', 'hash')} #
+@@end
 @@if action == 'SHIFT':
 					shift state(@@{value})
 @@elif action == 'APPLY':
@@ -100,7 +86,6 @@ BEGIN
 @@elif action == 'ACCEPT':
 					yyparse result := 0;
 					GO TO exit
-				end
 @@end
 @@end
 				FI
@@ -140,22 +125,17 @@ rule@@{number}:
 			END@@{',' if i != len(states) - 1 else ''}
 @@end
 @@else:
-@@first_case = True
-@@case_list = sorted(pair for pair in table.items() if pair[0] != -1)
-@@for index, (token, entry) in enumerate(case_list):
+@@for index, (token, entry) in enumerate(sorted(table.items(), key = lambda pair: (pair[0] == -1, *pair))):
+@@if token == -1:
+				ELSE
+@@else:
 				@@{'IF' if index == 0 else 'ELIF'} current = @@{token} THEN # @@{repr(tokens[token] if token in tokens else chr(token)).replace('#', 'hash')} #
-@@first_case = False
+@@end
 					goto state(@@{entry});
 					GO TO select
 @@end
-@@if -1 in table:
-@@entry = table[-1]
-				ELSE
-					goto state(@@{entry});
-					go to select
-				FI
-@@else:
 				FI;
+@@if -1 not in table:
 				GO TO select
 @@end
 			END@@{',' if i != len(states) - 1 else ''}
