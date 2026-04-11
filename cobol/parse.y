@@ -15,6 +15,15 @@
          03 StringValue PICTURE X(16) VALUE SPACES.
          03 Numerical REDEFINES StringValue PICTURE S9(10) VALUE ZEROES.
         02 TokenCharPosition PICTURE 9(2) VALUE ZEROES.
+
+       01 VariableData.
+        02 Definition OCCURS 128 TIMES.
+         03 VariableName PICTURE X(16) VALUE SPACES.
+         03 VariableValue PICTURE S9(10) VALUE ZEROES.
+        02 DefinitionCount PICTURE 9(3) VALUE ZEROES.
+        02 SearchName PICTURE X(16) VALUE SPACES.
+        02 SearchValue PICTURE S9(10) VALUE ZEROES.
+        02 DefIdx PICTURE 9(3).
 %}
 
 %define yystype {
@@ -36,6 +45,9 @@ program
 line
 	: IDENTIFIER '=' expression
 		{
+			MOVE StringValue IN $1 TO SearchName
+			MOVE Numerical IN $3 TO SearchValue
+			PERFORM DefineName
 		}
 	| expression
 		{
@@ -46,6 +58,9 @@ line
 primary
 	: IDENTIFIER
 		{
+			MOVE StringValue IN $1 TO SearchName
+			PERFORM LookupName THRU LookupNameEnd
+			MOVE SearchValue TO Numerical IN $$
 		}
 	| INTEGER
 		{
@@ -131,6 +146,7 @@ expression
           GO TO YYLex
 
          WHEN NextCharacter IS ALPHABETIC
+          MOVE SPACES TO StringValue IN TokenValue
           MOVE 1 TO TokenCharPosition
           PERFORM
             TEST BEFORE
@@ -168,4 +184,22 @@ expression
 
        YYError.
         DISPLAY "syntax error".
+
+       DefineName.
+        ADD 1 TO DefinitionCount.
+        MOVE SearchName  TO VariableName  IN Definition(DefinitionCount).
+        MOVE SearchValue TO VariableValue IN Definition(DefinitionCount).
+
+       LookupName.
+        PERFORM VARYING DefIdx FROM 1 BY 1 UNTIL DefIdx > DefinitionCount
+         IF VariableName IN Definition(DefIdx) = SearchName
+          MOVE VariableValue IN Definition(DefIdx) TO SearchValue
+          GO TO LookupNameEnd
+         END-IF
+        END-PERFORM.
+        DISPLAY "Undefined name " SearchName.
+        MOVE 0 TO SearchValue.
+
+       LookupNameEnd.
+        EXIT.
 
