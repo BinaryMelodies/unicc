@@ -1,5 +1,5 @@
 
-all: c java cs pascal basic f77 f95 rust pli algol60 algolw simula algol68 foxpro
+all: c java cs pascal basic f77 f95 rust pli algol60 algolw simula algol68 foxpro cobol
 
 clean:
 	make -C c clean
@@ -16,6 +16,7 @@ clean:
 	make -C simula clean
 	make -C algol68 clean
 	make -C foxpro clean
+	make -C cobol clean
 
 distclean: clean
 	rm -rf *~ */*~
@@ -62,4 +63,7 @@ algol60:
 foxpro:
 	make -C foxpro
 
-.PHONY: all clean distclean c java cs pascal basic f77 f95 rust pli algol60 algolw simula algol68 foxpro
+cobol:
+	make -C cobol
+
+.PHONY: all clean distclean c java cs pascal basic f77 f95 rust pli algol60 algolw simula algol68 foxpro cobol
