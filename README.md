@@ -25,6 +25,7 @@ The repository contains examples for a couple of target languages:
 * FoxPro (experimental, tested with Microsoft FoxPro 2.6 for MS-DOS)
 * COBOL using [GnuCOBOL](https://gnucobol.sourceforge.io/)
 * [Go](https://go.dev/)
+* Eiffel using [Liberty Eiffel](https://www.liberty-eiffel.org/)
 
 The examples are very simple and do not always reflect best programming practices.
 The same calculator application is implemented in each language.

@@ -47,8 +47,8 @@ feature {ANY}
 @@for token, (action, value) in sorted(table.items()):
 @@if action == 'SHIFT':
 					value_stk.put(yylval, stk_pos)
-					stk_pos := stk_pos + 1;
-					state_stk.put(@@{value}, stk_pos);
+					stk_pos := stk_pos + 1
+					state_stk.put(@@{value}, stk_pos)
 					look_ahead := yylex
 @@elif action == 'APPLY':
 					apply_rule := @@{value}

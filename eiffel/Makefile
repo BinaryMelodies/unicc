@@ -6,7 +6,7 @@ parse.e: parse.y eiffel.def ../unicc.py
 	python3 ../unicc.py eiffel.def $< $@
 
 clean:
-	rm -rf parse.e
+	rm -rf calc parse.e calc*.c calc*.o calc*.h calc*.id
 
 .PHONY: clean
 
