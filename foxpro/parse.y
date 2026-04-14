@@ -99,7 +99,7 @@ term
 		}
 	| term '/' factor
 		{
-			$$.iF $3.i = 0
+			IF $3.i = 0
 				SET TALK ON
 				? "Division by zero"
 				SET TALK OFF

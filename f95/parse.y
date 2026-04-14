@@ -89,7 +89,7 @@ term
 	| term '/' factor
 		{
 			if($3%i == 0) then
-				WRITE(*, *) "Division by zero"
+				write(*, *) "Division by zero"
 			else
 				$$%i = $1%i / $3%i
 			end if

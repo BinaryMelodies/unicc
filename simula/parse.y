@@ -131,7 +131,7 @@ term
 				$$ :- new YYInteger(0)
 			end
 			else
-				$$ :- new YYInteger($1 qua YYInteger.i / $3 qua YYInteger.i)
+				$$ :- new YYInteger($1 qua YYInteger.i // $3 qua YYInteger.i)
 		}
 	;
 

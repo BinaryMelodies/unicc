@@ -250,7 +250,7 @@ term
 				parser yyval := 0
 			end
 			else
-				parser yyval := parser val stk[$1] / parser val stk[$3]
+				parser yyval := parser val stk[$1] % parser val stk[$3]
 		}
 	;
 
