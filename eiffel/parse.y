@@ -6,22 +6,6 @@ feature {}
 	yylval: YYSTYPE
 	globals: ARRAY[YYDEFINITION]
 
-	make_int(i: INTEGER): YYSTYPE
-		local
-			yyi: YYINTEGER
-		do
-			create yyi.make(i)
-			Result := yyi
-		end
-
-	make_str(s: STRING): YYSTYPE
-		local
-			yys: YYSTRING
-		do
-			create yys.make(s)
-			Result := yys
-		end
-
 	current_definition: YYDEFINITION
 	idx: INTEGER
 %}
@@ -70,9 +54,9 @@ primary
 
 			if current_definition = Void then
 				io.put_line("Undefined name " + $1.s)
-				$$ := make_int(0)
+				create {YYINTEGER} $$.make(0)
 			else
-				$$ := make_int(current_definition.value)
+				create {YYINTEGER} $$.make(current_definition.value)
 			end
 		}
 	| INTEGER
@@ -92,7 +76,7 @@ factor
 		}
 	| '-' factor
 		{
-			$$ := make_int(-$2.i)
+			create {YYINTEGER} $$.make(-$2.i)
 		}
 	;
 
@@ -103,15 +87,15 @@ term
 		}
 	| term '*' factor
 		{
-			$$ := make_int($1.i * $3.i)
+			create {YYINTEGER} $$.make($1.i * $3.i)
 		}
 	| term '/' factor
 		{
 			if $3.i = 0 then
 				io.put_line("Division by zero")
-				$$ := make_int(0)
+				create {YYINTEGER} $$.make(0)
 			else
-				$$ := make_int($1.i // $3.i)
+				create {YYINTEGER} $$.make($1.i // $3.i)
 			end
 		}
 	;
@@ -123,11 +107,11 @@ expression
 		}
 	| expression '+' term
 		{
-			$$ := make_int($1.i + $3.i)
+			create {YYINTEGER} $$.make($1.i + $3.i)
 		}
 	| expression '-' term
 		{
-			$$ := make_int($1.i - $3.i)
+			create {YYINTEGER} $$.make($1.i - $3.i)
 		}
 	;
 
@@ -163,7 +147,7 @@ feature {}
 					std_input.read_character
 				end
 				std_input.unread_character
-				yylval := make_int(value)
+				create {YYINTEGER} yylval.make(value)
 				Result := integer
 			elseif std_input.last_character.is_letter or std_input.last_character = '_' then
 				create text.make(16)
@@ -177,7 +161,7 @@ feature {}
 					std_input.read_character
 				end
 				std_input.unread_character
-				yylval := make_str(text)
+				create {YYSTRING} yylval.make(text)
 				Result := identifier
 			else
 				Result := std_input.last_character.code
