@@ -1,9 +1,10 @@
 
-all: c cpp java cs pascal basic f77 f95 rust pli algol60 algolw simula algol68 foxpro cobol
+all: c cpp objc java cs pascal basic f77 f95 rust pli algol60 algolw simula algol68 foxpro cobol
 
 clean:
 	make -C c clean
 	make -C cpp clean
+	make -C objc clean
 	make -C java clean
 	make -C cs clean
 	make -C pascal clean
@@ -27,6 +28,9 @@ c:
 
 cpp:
 	make -C cpp
+
+objc:
+	make -C obcj
 
 java:
 	make -C java
@@ -70,4 +74,4 @@ foxpro:
 cobol:
 	make -C cobol
 
-.PHONY: all clean distclean c cpp java cs pascal basic f77 f95 rust pli algol60 algolw simula algol68 foxpro cobol
+.PHONY: all clean distclean c cpp objc java cs pascal basic f77 f95 rust pli algol60 algolw simula algol68 foxpro cobol
