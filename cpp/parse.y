@@ -1,8 +1,8 @@
 
 %{
 #include <iostream>
+#include <map>
 #include <string>
-#include <vector>
 #include <variant>
 
 typedef std::variant<int, std::string> YYSTYPE;
@@ -12,14 +12,7 @@ YYSTYPE yylval;
 int yylex(void);
 void yyerror(const std::string& s);
 
-class definition
-{
-public:
-	std::string name;
-	int value;
-	definition(std::string name, int value) : name(name), value(value) { }
-};
-std::vector<definition> globals;
+std::map<std::string, int> globals;
 %}
 
 %token IDENTIFIER
@@ -36,7 +29,7 @@ program
 line
 	: IDENTIFIER '=' expression
 		{
-			globals.push_back(definition(std::get<std::string>($1), std::get<int>($3)));
+			globals[std::get<std::string>($1)] = std::get<int>($3);
 		}
 	| expression
 		{
@@ -47,17 +40,16 @@ line
 primary
 	: IDENTIFIER
 		{
-			for(std::vector<definition>::iterator definition = globals.begin(); definition != globals.end(); definition++)
+			std::map<std::string, int>::iterator definition = globals.find(std::get<std::string>($1));
+			if(definition != globals.end())
 			{
-				if(std::get<std::string>($1) == definition->name)
-				{
-					$$.emplace<int>(definition->value);
-					goto done;
-				}
+				$$.emplace<int>(definition->second);
 			}
-			std::cerr << "Undefined name " << std::get<std::string>($1) << std::endl;
-			$$.emplace<int>(0);
-		done: ;
+			else
+			{
+				std::cerr << "Undefined name " << std::get<std::string>($1) << std::endl;
+				$$.emplace<int>(0);
+			}
 		}
 	| INTEGER
 		{
@@ -82,6 +74,9 @@ factor
 
 term
 	: factor
+		{
+			$$ = $1;
+		}
 	| term '*' factor
 		{
 			$$.emplace<int>(std::get<int>($1) * std::get<int>($3));
@@ -102,6 +97,9 @@ term
 
 expression
 	: term
+		{
+			$$ = $1;
+		}
 	| expression '+' term
 		{
 			$$.emplace<int>(std::get<int>($1) + std::get<int>($3));
