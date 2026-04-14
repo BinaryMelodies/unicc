@@ -68,6 +68,9 @@ factor
 
 term
 	: factor
+		{
+			YI = STKI($1)
+		}
 	| term '*' factor
 		{
 			YI = STKI($1) * STKI($3)
@@ -84,6 +87,9 @@ term
 
 expression
 	: term
+		{
+			YI = STKI($1)
+		}
 	| expression '+' term
 		{
 			YI = STKI($1) + STKI($3)

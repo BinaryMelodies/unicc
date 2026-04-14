@@ -79,6 +79,9 @@ factor
 
 term
 	: factor
+		{
+			$$%i = $1%i
+		}
 	| term '*' factor
 		{
 			$$%i = $1%i * $3%i
@@ -95,6 +98,9 @@ term
 
 expression
 	: term
+		{
+			$$%i = $1%i
+		}
 	| expression '+' term
 		{
 			$$%i = $1%i + $3%i

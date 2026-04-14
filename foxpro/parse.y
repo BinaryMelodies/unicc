@@ -68,6 +68,9 @@ primary
 			ENDIF
 		}
 	| INTEGER
+		{
+			$$.i = $1.i
+		}
 	| '(' expression ')'
 		{
 			$$.i = $2.i
@@ -76,6 +79,9 @@ primary
 
 factor
 	: primary
+		{
+			$$.i = $1.i
+		}
 	| '-' factor
 		{
 			$$.i = -$2.i
@@ -84,6 +90,9 @@ factor
 
 term
 	: factor
+		{
+			$$.i = $1.i
+		}
 	| term '*' factor
 		{
 			$$.i = $1.i * $3.i
@@ -103,6 +112,9 @@ term
 
 expression
 	: term
+		{
+			$$.i = $1.i
+		}
 	| expression '+' term
 		{
 			$$.i = $1.i + $3.i

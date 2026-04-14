@@ -65,6 +65,9 @@ factor
 
 term
 	: factor
+		{
+			$$.I = $1.I
+		}
 	| term '*' factor
 		{
 			$$.I = $1.I * $3.I
@@ -81,6 +84,9 @@ term
 
 expression
 	: term
+		{
+			$$.I = $1.I
+		}
 	| expression '+' term
 		{
 			$$.I = $1.I + $3.I

@@ -60,6 +60,9 @@ factor
 
 term
 	: factor
+		{
+			$$ = $1;
+		}
 	| term '*' factor
 		{
 			$$ = (Integer)$1 * (Integer)$3;
@@ -80,6 +83,9 @@ term
 
 expression
 	: term
+		{
+			$$ = $1;
+		}
 	| expression '+' term
 		{
 			$$ = (Integer)$1 + (Integer)$3;
