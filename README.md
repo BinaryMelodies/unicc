@@ -9,7 +9,7 @@ The Yacc grammar it uses is itself stored in its parsed form in the code.
 
 The repository contains examples for a couple of target languages:
 * BASIC, compiled using [the FreeBASIC compiler](https://www.freebasic.net/)
-* C and C++, compiled using [the GNU Compiler Collection](https://gcc.gnu.org/)
+* C, C++ and Ada, compiled using [the GNU Compiler Collection](https://gcc.gnu.org/)
 * Objective-C, compiled using [Clang](https://clang.llvm.org/) and the [GNUstep library](https://www.gnustep.org/)
 * C Sharp, compiled using [Mono](https://www.mono-project.com/)
 * FORTRAN 77 with or without record extensions, compiled using GFortran (part of the GNU Compiler Collection)
