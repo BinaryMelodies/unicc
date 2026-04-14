@@ -184,7 +184,7 @@ term
 	| term '/' factor
 		{
 			if $3.i = 0 then
-				Put_Line("Division by zero\n");
+				Put_Line("Division by zero");
 				$$ := (IntegerToken, 0);
 			else
 				$$ := (IntegerToken, $1.i / $3.i);
