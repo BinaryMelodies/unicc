@@ -6,8 +6,41 @@ feature {}
 	yylval: YYSTYPE
 	globals: ARRAY[YYDEFINITION]
 
-	current_definition: YYDEFINITION
-	idx: INTEGER
+	define_variable(name: STRING; value: INTEGER)
+		local
+			current_definition: YYDEFINITION
+		do
+			create current_definition.make(name, value)
+			globals.add_last(current_definition)
+		end
+
+	lookup_variable(name: STRING): YYSTYPE
+		local
+			idx: INTEGER
+			current_definition: YYDEFINITION
+		do
+			current_definition := Void
+
+			from
+				idx := globals.lower
+			until
+				idx >= globals.lower + globals.count
+			or
+				current_definition /= Void
+			loop
+				if (globals@idx).name.is_equal(name) then
+					current_definition := globals@idx
+				end
+				idx := idx + 1
+			end
+
+			if current_definition = Void then
+				io.put_line("Undefined name " + name)
+				create {YYINTEGER} Result.make(0)
+			else
+				create {YYINTEGER} Result.make(current_definition.value)
+			end
+		end
 %}
 
 %token IDENTIFIER
@@ -24,8 +57,7 @@ program
 line
 	: IDENTIFIER '=' expression
 		{
-			create current_definition.make($1.s, $3.i)
-			globals.add_last(current_definition)
+			define_variable($1.s, $3.i)
 		}
 	| expression
 		{
@@ -37,27 +69,7 @@ line
 primary
 	: IDENTIFIER
 		{
-			current_definition := Void
-
-			from
-				idx := globals.lower
-			until
-				idx >= globals.lower + globals.count
-			or
-				current_definition /= Void
-			loop
-				if (globals@idx).name.is_equal($1.s) then
-					current_definition := globals@idx
-				end
-				idx := idx + 1
-			end
-
-			if current_definition = Void then
-				io.put_line("Undefined name " + $1.s)
-				create {YYINTEGER} $$.make(0)
-			else
-				create {YYINTEGER} $$.make(current_definition.value)
-			end
+			$$ := lookup_variable($1.s)
 		}
 	| INTEGER
 		{
