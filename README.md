@@ -80,6 +80,8 @@ Some notable design choices:
 
 * Lines that do not begin with `@@` can also have Python code interspersed using the `@@{...}` syntax (where the ellipsis should be replaced with some valid Python expression). This is accomplished using Python string interpolation, and this must be kept in mind when including such expressions.
 
+* DOS-based FoxPro has only one structure-like data type: databases. The implementation abuses temporary databases to simulate record handling. The value stack is represented as an (ordered) table of rows containing the values. To access elements on the value stack during rule application, a separate temporary database is created for each accessible element and their records loaded into them. This enables accessing an item such as `$2.i` as `v2.i` in the single element database `v2`. The variable `$$.i` is accessed as the local variable `i` that is later *gathered* into a database entry.
+
 The `%define` command may be used to pass additional information to the target generator.
 Since these are only observed by the `.def` file, their interpretation is entirely dependent on the target.
 However, some common identifiers include the following.
