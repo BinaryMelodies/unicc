@@ -1,5 +1,5 @@
 
-calc: calc.e parse.e yystype.e yyinteger.e yystring.e
+calc: calc.e parse.e yystype.e yyinteger.e yystring.e yydefinition.e
 	compile $< -o $@
 
 parse.e: parse.y eiffel.def ../unicc.py
