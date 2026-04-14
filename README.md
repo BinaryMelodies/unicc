@@ -24,6 +24,7 @@ The repository contains examples for a couple of target languages:
 * ALGOL 68 using the ELLA ALGOL 68RS compiler (note: the variable `$A68C` is expected to point to a script that generates a binary provided by the `-o` option, a simple example script is provided under the `algol68` directory)
 * FoxPro (experimental, tested with Microsoft FoxPro 2.6 for MS-DOS)
 * COBOL using [GnuCOBOL](https://gnucobol.sourceforge.io/)
+* [Go](https://go.dev/)
 
 The examples are very simple and do not always reflect best programming practices.
 The same calculator application is implemented in each language.
