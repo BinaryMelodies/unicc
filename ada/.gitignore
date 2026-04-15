@@ -1,5 +1,6 @@
 parse.adb
+parse.ads
 calc
 *.o
 *.ali
-b~parse.*
+b~*

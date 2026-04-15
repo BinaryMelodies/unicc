@@ -7,7 +7,7 @@ with Ada.IO_Exceptions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-procedure Parse is
+package body parse is
 	type TokenValueType is (EmptyToken, IntegerToken, StringToken);
 	type YYSTYPE(ValueType : TokenValueType := EmptyToken) is
 		record
@@ -35,8 +35,6 @@ procedure Parse is
 	begin
 		Put_Line(s);
 	end YYError;
-
-__ADA_INSERT_TOKEN_TYPES__
 
 	next_eol : Boolean := False;
 
@@ -108,6 +106,8 @@ __ADA_INSERT_TOKEN_TYPES__
 
 	found_name : Boolean;
 %}
+
+%header {parse.ads}
 
 %token T_IDENTIFIER
 %token T_INTEGER
@@ -208,10 +208,5 @@ expression
 	;
 
 %%
-
-	result : Integer;
-
-begin
-	YYParse(result);
-end Parse;
+end parse;
 
