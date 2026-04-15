@@ -1,5 +1,5 @@
 
-all: c cpp objc java cs pascal basic f77 f95 rust pli algol60 algolw simula algol68 foxpro cobol go ada eiffel
+all: c cpp objc java cs pascal basic f77 f95 rust pli algol60 algolw simula algol68 foxpro cobol go ada eiffel d
 
 clean:
 	make -C c clean
@@ -22,6 +22,7 @@ clean:
 	make -C go clean
 	make -C ada clean
 	make -C eiffel clean
+	make -C d clean
 
 distclean: clean
 	rm -rf *~ */*~
@@ -86,4 +87,7 @@ ada:
 eiffel:
 	make -C eiffel
 
-.PHONY: all clean distclean c cpp objc java cs pascal basic f77 f95 rust pli algol60 algolw simula algol68 foxpro cobol go ada eiffel
+d:
+	make -C d
+
+.PHONY: all clean distclean c cpp objc java cs pascal basic f77 f95 rust pli algol60 algolw simula algol68 foxpro cobol go ada eiffel d
