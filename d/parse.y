@@ -15,13 +15,7 @@ YYSTYPE yylval;
 int yylex();
 void yyerror(string s);
 
-struct definition
-{
-	string name;
-	int value;
-	definition * next;
-};
-definition * globals;
+int[string] globals;
 
 %}
 
@@ -39,11 +33,7 @@ program
 line
 	: IDENTIFIER '=' expression
 		{
-			definition * definition = new definition;
-			definition.name = $1.s;
-			definition.value = $3.i;
-			definition.next = globals;
-			globals = definition;
+			globals[$1.s] = $3.i;
 		}
 	| expression
 		{
@@ -54,17 +44,15 @@ line
 primary
 	: IDENTIFIER
 		{
-			for(definition * definition = globals; definition; definition = definition.next)
+			if($1.s in globals)
 			{
-				if($1.s == definition.name)
-				{
-					$$.i = definition.value;
-					goto done;
-				}
+				$$.i = globals[$1.s];
 			}
-			stderr.writefln("Undefined name %s", $1.s);
-			$$.i = 0;
-		done:
+			else
+			{
+				stderr.writefln("Undefined name %s", $1.s);
+				$$.i = 0;
+			}
 		}
 	| INTEGER
 		{
