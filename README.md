@@ -26,6 +26,7 @@ The repository contains examples for a couple of target languages:
 * COBOL using [GnuCOBOL](https://gnucobol.sourceforge.io/)
 * [Go](https://go.dev/)
 * Eiffel using [Liberty Eiffel](https://www.liberty-eiffel.org/)
+* BETA using the [Mjølner BETA System](https://github.com/olmadsen/beta-system)
 
 The examples are very simple and do not always reflect best programming practices.
 The same calculator application is implemented in each language.
