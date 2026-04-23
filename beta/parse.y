@@ -37,6 +37,18 @@ ORIGIN '~beta/basiclib/betaenv'
 	#);
 
 	yylval: ^YYSTYPE;
+
+	Definition: (#
+		name: ^Text;
+		value: @Integer;
+		next: ^Definition;
+	enter (name[], value)
+	do
+		globals[] -> next[];
+		this(Definition)[] -> globals[]
+	#);
+
+	globals: ^Definition;
 %}
 
 %token T_IDENTIFIER
@@ -53,11 +65,12 @@ program
 line
 	: T_IDENTIFIER '=' expression
 		{
-			(*struct definition * definition = malloc(sizeof(struct definition));
-			definition->name = $1.s;
-			definition->value = $3.i;
-			definition->next = globals;
-			globals = definition;*)
+			(#
+				new_definition: ^Definition
+			do
+				&Definition[] -> new_definition[];
+				($1.s, $3.i) -> new_definition
+			#)
 		}
 	| expression
 		{
@@ -69,18 +82,27 @@ line
 primary
 	: T_IDENTIFIER
 		{
-			(*for(struct definition * definition = globals; definition; definition = definition->next)
-			{
-				if(strcmp($1.s, definition->name) == 0)
-				{
-					$$.i = definition->value;
-					goto done;
-				}
-			}
-			fprintf(stderr, "Undefined name %s\n", $1.s);
-			$$.i = 0;
-		done:
-			free($1.s);*)
+			&YYINTEGER[] -> $$[];
+			(#
+				current_definition: ^Definition
+			do
+				globals[] -> current_definition[];
+				Lookup: (#
+				do
+					(if true
+					// current_definition[] = NONE then
+						'Undefined name ' -> puttext;
+						$1.s -> puttext;
+						putline;
+						0 -> ($$[] -> qua(# as::YYINTEGER #)).value
+					// $1.s -> current_definition.name.equal then
+						current_definition.value -> ($$[] -> qua(# as::YYINTEGER #)).value
+					else
+						current_definition.next[] -> current_definition[];
+						restart Lookup
+					if)
+				#)
+			#)
 		}
 	| T_INTEGER
 		{
